@@ -121,29 +121,37 @@
   </section>
 
   <!-- =================== TESTIMONIALS =================== -->
-  <section class="section-paper">
+  <section class="section-paper" id="reviews">
     <div class="wrap">
-      <div class="section-head">
-        <p class="eyebrow">From the neighborhood</p>
-        <h2>What customers say</h2>
-      </div>
-      <div class="testimonial-row">
-        <div class="testimonial">
-          <p>"Showed up fast when our old lawn company dropped the ball, and the edging looks better than it ever has."</p>
-          <cite>— Local Customer</cite>
+      <div class="reviews-head">
+        <div>
+          <p class="eyebrow">From the neighborhood</p>
+          <h2>What customers say</h2>
         </div>
-        <div class="testimonial">
-          <p>"Friendly, on time, and they explain exactly what the crew is doing each week."</p>
-          <cite>— Local Customer</cite>
-        </div>
-        <div class="testimonial">
-          <p>"Knows plants and where to use them — not just a mowing crew, real landscape know-how."</p>
-          <cite>— Local Customer</cite>
+        <div class="reviews-summary" id="reviewsSummary">
+          <span class="score">&hellip;</span>
         </div>
       </div>
-      <p class="form-note" style="margin-top:18px;">Replace these with real quotes from your Facebook reviews whenever you get a chance.</p>
+      <div class="testimonial-row" id="testimonialRow">
+        <p class="testimonial-loading">Loading reviews&hellip;</p>
+      </div>
+      <div style="margin-top:30px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+        <button class="btn btn-dark" id="viewAllReviewsBtn">View All Reviews</button>
+        <span class="form-note" id="reviewsUpdated"></span>
+      </div>
     </div>
   </section>
+
+  <!-- All-reviews modal -->
+  <div class="modal-overlay" id="reviewsModal" hidden>
+    <div class="modal-panel">
+      <button class="modal-close" id="reviewsModalClose" aria-label="Close reviews">&times;</button>
+      <p class="eyebrow">Sourced from Angi</p>
+      <h3 style="margin:0;">All Reviews</h3>
+      <p class="form-note" id="modalSummaryNote"></p>
+      <div class="review-list" id="reviewList"></div>
+    </div>
+  </div>
 
   <!-- =================== GALLERY =================== -->
   <section id="gallery" class="section-paper" style="background:var(--sand);">
@@ -297,6 +305,7 @@
     }
   });
 </script>
+<script src="reviews.js"></script>
 <script src="gallery.js"></script>
 </body>
 </html>

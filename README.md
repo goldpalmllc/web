@@ -13,6 +13,10 @@ A simple, static landing page for **Gold Palm Lawn & Landscape**, built to run o
 | `gallery.js` | Loads photos onto the homepage |
 | `images.json` | The list of gallery photos (starts empty) |
 | `images/` | Folder where uploaded photos are stored |
+| `reviews.json` | Current Angi reviews + star summary, refreshed weekly |
+| `reviews.js` | Loads reviews.json into the "What customers say" section + modal |
+| `scripts/update_reviews.py` | Script that re-fetches Angi reviews |
+| `.github/workflows/update-reviews.yml` | Schedules the weekly review refresh |
 
 ---
 
@@ -61,9 +65,13 @@ The gallery uploader works by saving a photo directly into your GitHub repo when
 - The "Crew photo" block in the About section is a placeholder — swap it for a real `<img>` tag once you have a photo you like, or just leave it and let the gallery carry the photos.
 - The dashed gallery tiles ("Photo coming soon") automatically disappear and get replaced as you upload real photos.
 
-## 5. Customize content
+## 6. Reviews ("What customers say")
 
-Open `index.html` in any text editor and update:
-- Phone number, hours, and service area (pulled from your public listings — double check they're current)
-- Service descriptions
-- Testimonials (currently placeholders — swap in real customer quotes when you have them)
+The reviews section pulls from your Angi listing automatically:
+
+- `reviews.json` holds the current reviews + star summary. The page (`reviews.js`) reads it to show 3 featured testimonials plus the "View All Reviews" popup.
+- `.github/workflows/update-reviews.yml` runs every **Monday at 8am Eastern** and re-fetches your Angi page via `scripts/update_reviews.py`, committing an updated `reviews.json` if anything changed. No setup needed — it works automatically once this repo is on GitHub, using GitHub's built-in Actions (free for public repos).
+- You can trigger it manually any time: repo → **Actions** tab → **Update Angi Reviews** → **Run workflow**.
+
+**Worth knowing:** Angi doesn't provide a public API, so this works by reading the same review page a browser would. If Angi changes their page's layout, the weekly run may stop finding new reviews — it's written to leave your existing `reviews.json` untouched rather than overwrite it with bad data, but it's worth glancing at the Actions tab every few months to confirm runs are still finding reviews. If it ever does break, you (or I) can hand-edit `reviews.json` directly — it's a simple list of `{name, date, rating, recommend, text}` entries — as a fallback while the scraper gets fixed.
+
