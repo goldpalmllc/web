@@ -1,10 +1,9 @@
 // ===========================================================
-// CONFIG — edit these three lines for your GitHub repo, then
-// you're done. See README.md for full setup steps.
+// CONFIG — edit these three lines for your GitHub repo
 // ===========================================================
-const GH_OWNER  = "goldpalmllc";
-const GH_REPO   = "web";
-const GH_BRANCH = "main"; // change to "master" if that's your default branch
+const GH_OWNER  = "YOUR-GITHUB-USERNAME";  // ← CHANGE THIS
+const GH_REPO   = "YOUR-REPO-NAME";        // ← CHANGE THIS (probably the repo name for goldpalmlandscape.llc)
+const GH_BRANCH = "main";
 
 // ===========================================================
 const TOKEN_KEY = "goldpalm_gh_token";
@@ -24,6 +23,8 @@ const uploadStatus= document.getElementById('uploadStatus');
 const thumbPreview= document.getElementById('thumbPreview');
 const recentList  = document.getElementById('recentList');
 const logoutBtn   = document.getElementById('logoutBtn');
+const progressContainer = document.getElementById('progressContainer');
+const progressBar = document.getElementById('progressBar');
 
 function getToken(){ return localStorage.getItem(TOKEN_KEY); }
 
@@ -50,14 +51,22 @@ logoutBtn.addEventListener('click', () => {
   location.reload();
 });
 
+// Preview multiple files
 fileInput.addEventListener('change', () => {
-  const file = fileInput.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    thumbPreview.innerHTML = `<img src="${e.target.result}" alt="Selected photo preview">`;
-  };
-  reader.readAsDataURL(file);
+  thumbPreview.innerHTML = '';
+  const files = fileInput.files;
+  if (files.length === 0) return;
+
+  thumbPreview.classList.add('multi');
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      thumbPreview.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
 });
 
 function fileToBase64(file){
@@ -87,39 +96,23 @@ function setStatus(msg, type){
 }
 
 async function uploadPhoto(){
-  const file = fileInput.files[0];
-  if(!file){ setStatus('Choose a photo first.', 'err'); return; }
+  const files = Array.from(fileInput.files);
+  if(files.length === 0){ setStatus('Choose at least one photo first.', 'err'); return; }
   if(GH_OWNER === 'YOUR-GITHUB-USERNAME'){
-    setStatus('Setup needed: edit GH_OWNER / GH_REPO at the top of upload.js first. See README.md.', 'err');
+    setStatus('Setup needed: edit GH_OWNER / GH_REPO at the top of upload.js first.', 'err');
     return;
   }
 
   uploadBtn.disabled = true;
-  setStatus('Uploading photo...', 'busy');
+  progressContainer.style.display = 'block';
+  progressBar.style.width = '0%';
+  setStatus(`Uploading ${files.length} photo(s)...`, 'busy');
 
   try{
-    const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-    const filename = `${Date.now()}-${safeName}`;
-    const filePath = `images/${filename}`;
-    const base64 = await fileToBase64(file);
+    const commonCaption = captionInput.value.trim();
+    let photosAdded = [];
 
-    // 1. Upload the image file itself
-    const uploadRes = await ghRequest(`contents/${filePath}`, {
-      method: 'PUT',
-      body: JSON.stringify({
-        message: `Add gallery photo ${filename}`,
-        content: base64,
-        branch: GH_BRANCH
-      })
-    });
-    if(!uploadRes.ok){
-      const err = await uploadRes.json().catch(() => ({}));
-      throw new Error(err.message || `Upload failed (${uploadRes.status})`);
-    }
-
-    setStatus('Updating gallery list...', 'busy');
-
-    // 2. Read current images.json (need its sha to update it)
+    // Read current images.json once
     const listRes = await ghRequest(`contents/images.json?ref=${GH_BRANCH}`);
     let sha = undefined;
     let photos = [];
@@ -130,38 +123,76 @@ async function uploadPhoto(){
       photos = JSON.parse(decoded || '[]');
     }
 
-    photos.push({
-      path: filePath,
-      caption: captionInput.value.trim(),
-      uploaded: new Date().toISOString()
-    });
+    for(let i = 0; i < files.length; i++){
+      const file = files[i];
+      const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+      const filename = `${Date.now()}-${i}-${safeName}`;
+      const filePath = `images/${filename}`;
+      const base64 = await fileToBase64(file);
 
+      // Upload image
+      const uploadRes = await ghRequest(`contents/${filePath}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          message: `Add gallery photo ${filename}`,
+          content: base64,
+          branch: GH_BRANCH
+        })
+      });
+
+      if(!uploadRes.ok){
+        const err = await uploadRes.json().catch(() => ({}));
+        throw new Error(`Failed to upload ${file.name}: ${err.message || uploadRes.status}`);
+      }
+
+      photos.push({
+        path: filePath,
+        caption: commonCaption,
+        uploaded: new Date().toISOString()
+      });
+      photosAdded.push({path: filePath, caption: commonCaption});
+
+      // Update progress
+      const progress = Math.round(((i + 1) / files.length) * 100);
+      progressBar.style.width = `${progress}%`;
+      setStatus(`Uploaded ${i+1}/${files.length}...`, 'busy');
+    }
+
+    // Final update to images.json
+    setStatus('Updating gallery list...', 'busy');
     const newContent = btoa(unescape(encodeURIComponent(JSON.stringify(photos, null, 2))));
 
     const updateRes = await ghRequest(`contents/images.json`, {
       method: 'PUT',
       body: JSON.stringify({
-        message: `Add ${filename} to gallery`,
+        message: `Batch add ${files.length} photos to gallery`,
         content: newContent,
         branch: GH_BRANCH,
-        sha
+        sha: sha
       })
     });
+
     if(!updateRes.ok){
       const err = await updateRes.json().catch(() => ({}));
-      throw new Error(err.message || `Gallery update failed (${updateRes.status})`);
+      throw new Error(err.message || `Gallery update failed`);
     }
 
-    setStatus('Uploaded! It will appear on the site in a minute or two.', 'ok');
+    setStatus(`Success! ${files.length} photo(s) uploaded. They will appear on the site soon.`, 'ok');
+
+    // Clear form
     fileInput.value = '';
     captionInput.value = '';
-    thumbPreview.innerHTML = '<span class="form-note">Photo preview</span>';
-    addToRecentList(filePath, photos[photos.length - 1].caption);
+    thumbPreview.innerHTML = '<span class="form-note">Photo previews will appear here</span>';
+    thumbPreview.classList.remove('multi');
+
+    // Add to recent
+    photosAdded.forEach(p => addToRecentList(p.path, p.caption));
 
   }catch(err){
-    setStatus(`Error: ${err.message}. Check your token and repo settings.`, 'err');
+    setStatus(`Error: ${err.message}. Check token/repo settings.`, 'err');
   }finally{
     uploadBtn.disabled = false;
+    progressContainer.style.display = 'none';
   }
 }
 
@@ -174,5 +205,5 @@ function addToRecentList(path, caption){
 
 uploadBtn.addEventListener('click', uploadPhoto);
 
-// auto-login if token already saved on this phone
+// Auto-login
 if(getToken()){ showLoggedIn(); }
