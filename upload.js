@@ -1,8 +1,8 @@
 // ===========================================================
 // CONFIG — edit these three lines for your GitHub repo
 // ===========================================================
-const GH_OWNER  = "YOUR-GITHUB-USERNAME";  // ← CHANGE THIS
-const GH_REPO   = "YOUR-REPO-NAME";        // ← CHANGE THIS (probably the repo name for goldpalmlandscape.llc)
+const GH_OWNER  = "goldpalmllc";  // ← CHANGE THIS
+const GH_REPO   = "web";        // ← CHANGE THIS (probably the repo name for goldpalmlandscape.llc)
 const GH_BRANCH = "main";
 
 // ===========================================================
