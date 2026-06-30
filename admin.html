@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Upload Photos | Gold Palm Lawn &amp; Landscape</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  .admin-wrap{ max-width: 480px; margin: 0 auto; padding: 70px 24px 100px; }
+  .admin-card{ background: var(--paper); border:1px solid var(--line); border-radius: var(--radius); padding: 28px; }
+  .admin-card + .admin-card{ margin-top: 18px; }
+  .thumb-preview{ width:100%; aspect-ratio:1/1; border-radius: var(--radius); overflow:hidden; background: var(--sand); display:flex; align-items:center; justify-content:center; margin-bottom: 16px; border: 1px dashed var(--line); }
+  .thumb-preview img{ width:100%; height:100%; object-fit:cover; }
+  .small-link{ font-family: var(--mono); font-size:0.75rem; text-decoration:underline; color: var(--palm); }
+  .upload-status{ font-family: var(--mono); font-size:0.85rem; margin-top:12px; }
+  .upload-status.ok{ color: var(--palm); }
+  .upload-status.err{ color: var(--clay); }
+  .upload-status.busy{ color: #6c6a5c; }
+  .photo-list{ margin-top:10px; display:flex; flex-direction:column; gap:8px; }
+  .photo-list-item{ display:flex; align-items:center; gap:10px; font-family: var(--mono); font-size:0.78rem; }
+  .photo-list-item img{ width:42px; height:42px; object-fit:cover; border-radius:3px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a href="index.html" class="brand">
+      <span class="brand-mark">GP</span>
+      <span class="brand-text">Gold Palm<span>Photo Upload</span></span>
+    </a>
+    <a href="index.html" class="btn btn-ghost" style="padding:9px 18px;">Back to Site</a>
+  </div>
+</header>
+
+<div class="admin-wrap">
+
+  <!-- LOGIN STEP -->
+  <div class="admin-card" id="loginCard">
+    <p class="eyebrow">Step 1</p>
+    <h3>Sign in to upload</h3>
+    <p class="form-note" style="margin-bottom:16px;">Paste your GitHub access token once. Your phone will remember it after that — no need to log in again.</p>
+    <div class="field">
+      <label for="tokenInput">Access Token</label>
+      <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+    </div>
+    <button class="btn btn-primary" id="loginBtn" style="margin-top:14px;">Save &amp; Continue</button>
+    <p class="small-link" style="display:block; margin-top:14px;" id="howToToken">How do I get a token?</p>
+    <div id="tokenHelp" style="display:none; margin-top:12px; font-size:0.88rem; color:#4a4a3f;">
+      <ol style="padding-left:18px; margin:0;">
+        <li>On GitHub, go to <b>Settings &rarr; Developer settings &rarr; Personal access tokens &rarr; Fine-grained tokens</b>.</li>
+        <li>Click <b>Generate new token</b>, name it "Gold Palm photo upload".</li>
+        <li>Under <b>Repository access</b>, choose only this website's repository.</li>
+        <li>Under <b>Permissions</b>, set <b>Contents</b> to <b>Read and write</b>.</li>
+        <li>Generate it, copy the token, and paste it above. Save it somewhere safe — GitHub only shows it once.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- UPLOAD STEP -->
+  <div class="admin-card" id="uploadCard" style="display:none;">
+    <p class="eyebrow">Step 2</p>
+    <h3>Add a photo</h3>
+    <div class="thumb-preview" id="thumbPreview">
+      <span class="form-note">Photo preview</span>
+    </div>
+    <div class="field">
+      <label for="fileInput">Choose Photo</label>
+      <input type="file" id="fileInput" accept="image/*" capture="environment">
+    </div>
+    <div class="field" style="margin-top:12px;">
+      <label for="captionInput">Caption (optional)</label>
+      <input type="text" id="captionInput" placeholder="e.g. Paver patio install, Tradition">
+    </div>
+    <button class="btn btn-primary" id="uploadBtn" style="margin-top:16px;">Upload to Gallery</button>
+    <p class="upload-status" id="uploadStatus"></p>
+  </div>
+
+  <div class="admin-card" id="recentCard" style="display:none;">
+    <p class="eyebrow">Recently added</p>
+    <div class="photo-list" id="recentList"></div>
+  </div>
+
+  <div class="admin-card" id="logoutCard" style="display:none;">
+    <button class="btn btn-dark" id="logoutBtn">Sign Out On This Phone</button>
+  </div>
+
+</div>
+
+<script src="upload.js"></script>
+</body>
+</html>
