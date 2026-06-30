@@ -2,8 +2,8 @@
 // CONFIG — edit these three lines for your GitHub repo, then
 // you're done. See README.md for full setup steps.
 // ===========================================================
-const GH_OWNER  = "YOUR-GITHUB-USERNAME";
-const GH_REPO   = "YOUR-REPO-NAME";
+const GH_OWNER  = "goldpalmllc";
+const GH_REPO   = "web";
 const GH_BRANCH = "main"; // change to "master" if that's your default branch
 
 // ===========================================================
