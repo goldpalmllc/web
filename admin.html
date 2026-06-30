@@ -14,8 +14,10 @@
   .admin-wrap{ max-width: 480px; margin: 0 auto; padding: 70px 24px 100px; }
   .admin-card{ background: var(--paper); border:1px solid var(--line); border-radius: var(--radius); padding: 28px; }
   .admin-card + .admin-card{ margin-top: 18px; }
-  .thumb-preview{ width:100%; aspect-ratio:1/1; border-radius: var(--radius); overflow:hidden; background: var(--sand); display:flex; align-items:center; justify-content:center; margin-bottom: 16px; border: 1px dashed var(--line); }
+  .thumb-preview{ width:100%; aspect-ratio:1/1; border-radius: var(--radius); overflow:hidden; background: var(--sand); display:flex; align-items:center; justify-content:center; margin-bottom: 16px; border: 1px dashed var(--line); position:relative; }
   .thumb-preview img{ width:100%; height:100%; object-fit:cover; }
+  .thumb-preview.multi { flex-wrap: wrap; gap: 4px; overflow: auto; }
+  .thumb-preview.multi img { width: 48%; height: auto; aspect-ratio: 1/1; object-fit: cover; }
   .small-link{ font-family: var(--mono); font-size:0.75rem; text-decoration:underline; color: var(--palm); }
   .upload-status{ font-family: var(--mono); font-size:0.85rem; margin-top:12px; }
   .upload-status.ok{ color: var(--palm); }
@@ -24,6 +26,8 @@
   .photo-list{ margin-top:10px; display:flex; flex-direction:column; gap:8px; }
   .photo-list-item{ display:flex; align-items:center; gap:10px; font-family: var(--mono); font-size:0.78rem; }
   .photo-list-item img{ width:42px; height:42px; object-fit:cover; border-radius:3px; }
+  .progress { margin-top: 8px; height: 6px; background: #e5e5d9; border-radius: 3px; overflow: hidden; }
+  .progress-bar { height: 100%; background: var(--palm); width: 0%; transition: width 0.3s ease; }
 </style>
 </head>
 <body>
@@ -64,20 +68,21 @@
 
   <!-- UPLOAD STEP -->
   <div class="admin-card" id="uploadCard" style="display:none;">
-    <p class="eyebrow">Step 2</p>
-    <h3>Add a photo</h3>
+    <p class="eyebrow">Step 2 — Batch Upload</p>
+    <h3>Add Photos to Gallery</h3>
     <div class="thumb-preview" id="thumbPreview">
-      <span class="form-note">Photo preview</span>
+      <span class="form-note">Photo previews will appear here</span>
     </div>
     <div class="field">
-      <label for="fileInput">Choose Photo</label>
-      <input type="file" id="fileInput" accept="image/*" capture="environment">
+      <label for="fileInput">Choose Photos (multiple allowed)</label>
+      <input type="file" id="fileInput" accept="image/*" capture="environment" multiple>
     </div>
     <div class="field" style="margin-top:12px;">
-      <label for="captionInput">Caption (optional)</label>
+      <label for="captionInput">Common Caption (optional — applied to all)</label>
       <input type="text" id="captionInput" placeholder="e.g. Paver patio install, Tradition">
     </div>
-    <button class="btn btn-primary" id="uploadBtn" style="margin-top:16px;">Upload to Gallery</button>
+    <button class="btn btn-primary" id="uploadBtn" style="margin-top:16px;">Upload All to Gallery</button>
+    <div class="progress" id="progressContainer" style="display:none;"><div class="progress-bar" id="progressBar"></div></div>
     <p class="upload-status" id="uploadStatus"></p>
   </div>
 
