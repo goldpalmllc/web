@@ -6,7 +6,7 @@ async function loadReviews() {
   // Angi Reviews
   try {
     const angiRes = await fetch('https://api.allorigins.win/get?url=' + 
-      encodeURIComponent('https://www.angi.com/company/gold-palm-lawn-and-landscape/reviews'));
+      encodeURIComponent('https://www.angi.com/companylist/us/fl/fort-pierce/gold-palm-lawn-and-landscape-corp-reviews-161920782.htm'));
     if (angiRes.ok) {
       const data = await angiRes.json();
       const html = data.contents;
