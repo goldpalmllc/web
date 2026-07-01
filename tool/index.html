@@ -7,6 +7,11 @@
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <style>
+    .actions button {
+      margin: 5px;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -27,16 +32,17 @@
         <h2 id="templateName">Select Template</h2>
         
         <div class="preview-container">
-          <canvas id="pdfCanvas" style="border:1px solid #ccc; max-width:100%;"></canvas>
-          <div id="clickHint" style="position:absolute; color:#666; font-size:0.9em;">Click on PDF to add text area</div>
+          <canvas id="pdfCanvas" style="border:1px solid #ccc; max-width:100%; cursor:crosshair;"></canvas>
+          <div id="clickHint" style="position:absolute; color:#666; font-size:0.9em; pointer-events:none;">Click on PDF to add text area</div>
         </div>
 
         <h3>Text Areas</h3>
         <div id="areasList"></div>
 
         <div class="actions">
-          <button onclick="generatePDF()" class="primary">Generate & Download PDF</button>
-          <button onclick="sendToOutlook()" class="secondary">Send via Outlook</button>
+          <button onclick="previewPDF()" style="background:#28a745; color:white;">👁 Preview Filled PDF</button>
+          <button onclick="generatePDF()" class="primary">⬇️ Generate & Download</button>
+          <button onclick="sendToOutlook()" class="secondary">✉️ Send via Outlook</button>
         </div>
       </section>
     </div>
