@@ -372,3 +372,10 @@ footer{ background: var(--ink); color: var(--sand); padding: 50px 0 30px; }
 }
 .logo-badge img{ height: 44px; width:auto; display:block; }
 @media (max-width:480px){ .logo-badge img{ height:36px; } }
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(21,32,26,0.4) 0%, rgba(21,32,26,0.75) 100%);
+  pointer-events: none;
+}
